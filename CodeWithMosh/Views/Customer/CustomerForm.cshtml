@@ -1,0 +1,38 @@
+﻿@model CodeWithMosh.Models.ViewModels.CustomerFormViewModel
+
+<h2>New Customer</h2>
+
+<form asp-action="Save" asp-controller="Customer" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Customer.Name)
+        <label asp-for="Customer.Name">Customer Name</label>
+        <input asp-for="Customer.Name" class="form-control" />
+        <span asp-validation-for="Customer.Name"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MembershipTypes">Membership type</label>
+        <select asp-for="Customer.MembershipTypeId" class="form-control">
+            <option value="">Select Membership</option>
+            @foreach (var item in Model.MembershipTypes)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+        <span asp-validation-for="MembershipTypes"></span>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" asp-for="Customer.IsSubscribedToNewsletter">
+        <label class="form-check-label" asp-for="Customer.IsSubscribedToNewsletter">
+            Subscribed to Newsletter
+        </label>
+    </div>
+    <input hidden asp-for="Customer.Id" />
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@section Scripts{
+    @{
+        <partial name="_validationscriptspartial" />
+    }
+    }
