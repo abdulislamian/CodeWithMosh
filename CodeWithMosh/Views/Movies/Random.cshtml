@@ -1,3 +1,23 @@
-﻿@model CodeWithMosh.Models.Movies
+﻿@model CodeWithMosh.Models.ViewModels.RandomMovieViewModel
 
-<h2>@Model.Name</h2>
+@{
+    var className = Model.Customers.Count > 2 ? "popular" : null;   // dynamic render class
+}
+
+
+<h2 class="@className">@Model.Movie.Name</h2>
+
+@if(Model.Customers.Count==0)
+{
+    <p>No one rendered then movie</p>
+}
+else{
+<ul>
+
+    @foreach (var item in Model.Customers)
+    {
+        <li>@item.Name</li>
+    }
+
+</ul>
+}

@@ -1,11 +1,13 @@
 ﻿using CodeWithMosh.Data;
 using CodeWithMosh.Models;
 using CodeWithMosh.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CodeWithMosh.Controllers
 {
+   
     public class CustomerController : Controller
     {
         private readonly ApplicationDbContext dbContext;

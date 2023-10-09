@@ -1,60 +1,65 @@
 ﻿using CodeWithMosh.Data;
 using CodeWithMosh.Models;
 using CodeWithMosh.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CodeWithMosh.Controllers
 {
+    [Authorize]
     public class MoviesController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
-
-        public MoviesController(ApplicationDbContext _dbContext)
+        private readonly ApplicationDbContext _db;
+        public MoviesController(ApplicationDbContext db)
         {
-            dbContext = _dbContext;
+            _db = db;
         }
-        public ViewResult New()
+        public IActionResult Index()
         {
-            var genres = dbContext.Genres.ToList();
 
-            var viewModel = new MovieFormViewModel
+            var data = _db.Movies.Include(c => c.Genre).ToList();
+            if (data == null)
             {
-                Genres = genres
-            };
-
-            return View("MovieForm", viewModel);
-        }
-
-        public IActionResult Random()
-        {
-            var movie = new Movies() { Name = "Shrek!" };
-            var customers = new List<Customer>
-            {
-                new Customer { Name = "Customer 1" },
-                new Customer { Name = "Customer 2" }
-            };
-
-            var viewModel = new RandomMovieViewModel
-            {
-                Movie = movie,
-                Customers = customers
-            };
-
-            return View(viewModel);
-        }
-        public IActionResult Edit(int id)
-        {
-            return View();
-        }
-        public IActionResult Index(int? pageIndex, string? sortBy)
-        {
-            if(!pageIndex.HasValue)
-            {
-                pageIndex = 1;
+                return NotFound();
             }
-            if (string.IsNullOrWhiteSpace(sortBy))
-                sortBy = "Name";
-            return Content(string.Format("Page Index={0}&sortBy={1}",pageIndex,sortBy));
+            if (User.IsInRole(Utility.Helper.Admin))
+            {
+                return View("Index", data);
+            }
+            return View("ReadOnlyList", data);
+
         }
+        public ActionResult Details(int id)
+        {
+            var movies = _db.Movies.Include(c => c.Genre).SingleOrDefault(c => c.Id == id);
+
+            if (movies == null)
+                return NotFound();
+
+            return View(movies);
+        }
+
+
+
+        //public IActionResult Random()
+        //{ 
+        //    var movies = new Movie() {Name = "Sherk"};
+
+        //    var customers = new List<Customer>
+        //    {
+        //        new Customer { Name = "Customer1"},
+        //        new Customer { Name = "Customer2"},
+
+        //    };
+
+        //    var randomMovieVm = new RandomMovieVM
+        //    {
+        //        Movie = movies,
+        //        Customers = customers
+        //    };
+        //    return View(randomMovieVm);
+        //}
     }
 }
