@@ -43,23 +43,5 @@ namespace CodeWithMosh.Controllers
 
 
 
-        //public IActionResult Random()
-        //{ 
-        //    var movies = new Movie() {Name = "Sherk"};
-
-        //    var customers = new List<Customer>
-        //    {
-        //        new Customer { Name = "Customer1"},
-        //        new Customer { Name = "Customer2"},
-
-        //    };
-
-        //    var randomMovieVm = new RandomMovieVM
-        //    {
-        //        Movie = movies,
-        //        Customers = customers
-        //    };
-        //    return View(randomMovieVm);
-        //}
     }
 }

@@ -1,6 +1,10 @@
 using CodeWithMosh.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +13,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("appConnection")));
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = "Identity.Application";
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+        .AddCookie()
+        .AddGoogle(opts =>
+        {
+            opts.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+            opts.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+            opts.SignInScheme = IdentityConstants.ApplicationScheme;
+        });
 var app = builder.Build();
 
 
@@ -25,11 +41,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

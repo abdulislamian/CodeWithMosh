@@ -1,9 +1,11 @@
 ﻿using CodeWithMosh.Data;
 using CodeWithMosh.Models.ViewModels;
 using CodeWithMosh.Utility;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CodeWithMosh.Controllers
 {
@@ -29,12 +31,58 @@ namespace CodeWithMosh.Controllers
         {
             return View();
         }
+        [AllowAnonymous]
+        public IActionResult GoogleLogin()
+        {
+            string redirectUrl = Url.Action("GoogleResponse", "Account");
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return new ChallengeResult("Google", properties);
+        }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+                return RedirectToAction(nameof(Login));
+
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+            string[] userInfo = { info.Principal.FindFirst(ClaimTypes.Name).Value, info.Principal.FindFirst(ClaimTypes.Email).Value };
+            if (result.Succeeded)
+                return View(userInfo);
+            else
+            {
+                ApplicationUser user = new ApplicationUser
+                {
+                    Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
+                    UserName = info.Principal.FindFirst(ClaimTypes.Email).Value,
+                    Name = info.Principal.FindFirst(ClaimTypes.Name).Value
+                };
+
+                IdentityResult identResult = await _userManager.CreateAsync(user);
+                if (identResult.Succeeded)
+                {
+                    identResult = await _userManager.AddLoginAsync(user, info);
+                    if (identResult.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, false);
+                        return View(userInfo);
+                    }
+                }
+                return AccessDenied();
+                //return RedirectToAction("Index", "Home");
+            }
+        }
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
@@ -89,10 +137,11 @@ namespace CodeWithMosh.Controllers
             }
             return View(model);
         }
+        [Authorize]
         public async Task<IActionResult> LogOut()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            return View(nameof(Login));
         }
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodeWithMosh.Controllers
 {
-   
+    [Authorize]
     public class CustomerController : Controller
     {
         private readonly ApplicationDbContext dbContext;

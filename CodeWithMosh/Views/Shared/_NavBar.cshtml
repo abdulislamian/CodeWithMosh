@@ -20,6 +20,8 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
+
+                <partial name="_LoginPartial" />
                 <li class="nav-item">
                     <a class="nav-link text-dark" asp-controller="Customer" asp-action="Index">Customers</a>
                 </li>
@@ -30,7 +32,6 @@
                 <li>@Html.ActionLink("Customers", "Index", "Customers")</li>
                 <li>@Html.ActionLink("Movies", "Index", "Movies")</li>*@
             </ul>
-            <partial name="_LoginPartial" />
         </div>
     </div>
 </div>
