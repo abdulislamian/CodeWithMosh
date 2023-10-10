@@ -53,7 +53,8 @@ namespace CodeWithMosh.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
             string[] userInfo = { info.Principal.FindFirst(ClaimTypes.Name).Value, info.Principal.FindFirst(ClaimTypes.Email).Value };
             if (result.Succeeded)
-                return View(userInfo);
+                //return View(userInfo);
+                return RedirectToAction("Index", "Home");
             else
             {
                 ApplicationUser user = new ApplicationUser
@@ -70,7 +71,9 @@ namespace CodeWithMosh.Controllers
                     if (identResult.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, false);
-                        return View(userInfo);
+                        //return View(userInfo);
+
+                        return RedirectToAction("Index", "Home");
                     }
                 }
                 return AccessDenied();

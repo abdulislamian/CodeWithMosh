@@ -50,6 +50,19 @@ namespace CodeWithMosh.Data
 
             };
             builder.Entity<MembershipType>().HasData(membershipType);
+
+            // Configure the Genre entity
+            builder.Entity<Genre>().HasData(
+                new Genre { Id = 1, Name = "Action" },
+                new Genre { Id = 2, Name = "Drama" }
+            );
+
+
+            builder.Entity<Movies>().HasData(
+                new Movies { Id = 1, Name = "John Wick", GenreId = 1 },
+                new Movies { Id = 2, Name = "3 Idiots", GenreId = 2 }
+            );
+
         }
     }
 
